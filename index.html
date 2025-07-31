@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plano Interativo: Mandarim HSK1 em 90 Dias</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chosen Palette: Zen Garden (Light Beige, Terracotta, Muted Green, Dark Slate Gray) -->
+    <!-- Application Structure Plan: A tabbed, dashboard-style single-page application. The structure (Início, O Desafio HSK1, Plano de 90 Dias, Recursos, Dicas) was chosen to break down the dense report into manageable, non-linear sections. This allows the user to explore based on their immediate needs (e.g., just checking resources) rather than being forced to scroll linearly. Key interactions include a phase-switcher for the study plan with a dynamic chart and filterable resource cards, enhancing usability and engagement. -->
+    <!-- Visualization & Content Choices: HSK1 components (Vocab, Grammar, Chars) are in clickable cards to reduce initial cognitive load. The 90-day plan uses an interactive timeline and a dynamic Chart.js doughnut chart to visualize time allocation per phase, making the commitment tangible. Resource lists are transformed from static tables into a filterable grid of cards for easy navigation. All diagrams are built with HTML/Tailwind. This supports the tabbed structure by making each section a self-contained, interactive module. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F5F5DC; /* Light Beige */
+            color: #36454F; /* Dark Slate Gray */
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link.active {
+            border-bottom-color: #E57373; /* Terracotta accent */
+            color: #E57373;
+        }
+        .nav-link:hover {
+            border-bottom-color: #E57373;
+            color: #E57373;
+        }
+        .card {
+            background-color: #FFFFFF;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .btn {
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .btn:hover {
+            transform: scale(1.05);
+        }
+        .btn-phase.active {
+            background-color: #E57373 !important;
+            color: white;
+        }
+        .filter-btn.active {
+            background-color: #81C784; /* Muted Green */
+            color: white;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto px-4 py-8">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-[#36454F]">Domine o Mandarim</h1>
+            <p class="text-xl text-[#6A5ACD] mt-2">Seu Plano Interativo para o HSK1 em 90 Dias</p>
+        </header>
+
+        <nav class="flex justify-center border-b-2 border-gray-200 mb-8 flex-wrap">
+            <a href="#inicio" class="nav-link active text-lg font-semibold py-4 px-6" data-tab="inicio">🚀 Início</a>
+            <a href="#desafio" class="nav-link text-lg font-semibold py-4 px-6" data-tab="desafio">🎯 O Desafio HSK1</a>
+            <a href="#plano" class="nav-link text-lg font-semibold py-4 px-6" data-tab="plano">🗓️ Plano de 90 Dias</a>
+            <a href="#recursos" class="nav-link text-lg font-semibold py-4 px-6" data-tab="recursos">📚 Recursos</a>
+            <a href="#dicas" class="nav-link text-lg font-semibold py-4 px-6" data-tab="dicas">💡 Dicas</a>
+        </nav>
+
+        <main>
+            <section id="inicio" class="tab-content">
+                <div class="card p-8 text-center">
+                    <h2 class="text-3xl font-bold mb-4">Bem-vindo à sua jornada intensiva!</h2>
+                    <p class="text-lg mb-6 max-w-3xl mx-auto">Atingir o nível HSK1 em 90 dias é uma meta ambiciosa, mas totalmente alcançável com a estratégia certa. Esta aplicação foi criada para ser sua companheira, transformando o plano de estudos em uma experiência interativa. Seu perfil, com formação superior e interesse em temas complexos, é uma grande vantagem que usaremos para tornar o aprendizado mais "irresistível".</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-2xl font-bold">
+                        <div class="bg-red-100 p-6 rounded-lg">
+                            <p>🎯 90 Dias</p>
+                            <p class="text-base font-normal">Meta Intensiva</p>
+                        </div>
+                        <div class="bg-green-100 p-6 rounded-lg">
+                            <p>🗣️ 150 Palavras</p>
+                            <p class="text-base font-normal">Vocabulário Essencial</p>
+                        </div>
+                        <div class="bg-blue-100 p-6 rounded-lg">
+                            <p>✍️ 150 Caracteres</p>
+                            <p class="text-base font-normal">Base da Leitura</p>
+                        </div>
+                    </div>
+                    <p class="mt-8 text-lg">Use a navegação acima para explorar cada secção do seu plano. Vamos começar!</p>
+                </div>
+            </section>
+
+            <section id="desafio" class="tab-content hidden">
+                 <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold">Desvendando o HSK1</h2>
+                    <p class="text-lg mt-2 max-w-3xl mx-auto">O HSK1 é o primeiro passo na sua jornada. Ele avalia a sua capacidade de comunicação básica em situações cotidianas. Para ser aprovado, você precisa dominar três áreas principais. Clique em cada uma para ver os detalhes.</p>
+                </div>
+                <div id="accordion-container" class="space-y-4">
+                    <!-- Accordion items will be injected here by JS -->
+                </div>
+            </section>
+
+            <section id="plano" class="tab-content hidden">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold">Seu Plano de Batalha de 90 Dias</h2>
+                    <p class="text-lg mt-2 max-w-3xl mx-auto">Este plano divide sua jornada em três fases progressivas. Cada fase tem um foco específico para construir seu conhecimento de forma sólida e eficiente. Selecione uma fase para ver as atividades e a alocação de tempo de estudo sugerida.</p>
+                </div>
+                <div class="flex justify-center space-x-2 md:space-x-4 mb-8">
+                    <button class="btn btn-phase active text-sm md:text-base font-semibold py-2 px-4 rounded-full bg-gray-200" data-phase="1">Fase 1: Fundamentos</button>
+                    <button class="btn btn-phase text-sm md:text-base font-semibold py-2 px-4 rounded-full bg-gray-200" data-phase="2">Fase 2: Construção</button>
+                    <button class="btn btn-phase text-sm md:text-base font-semibold py-2 px-4 rounded-full bg-gray-200" data-phase="3">Fase 3: Consolidação</button>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                    <div class="card p-6">
+                        <h3 id="phase-title" class="text-2xl font-bold mb-4"></h3>
+                        <p id="phase-description" class="mb-4"></p>
+                        <ul id="phase-activities" class="list-disc list-inside space-y-2"></ul>
+                    </div>
+                    <div class="card p-6">
+                        <h3 class="text-2xl font-bold mb-4 text-center">Rotina Diária Sugerida</h3>
+                        <div class="chart-container">
+                            <canvas id="dailyRoutineChart"></canvas>
+                        </div>
+                        <p id="total-time" class="text-center font-bold text-lg mt-4"></p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="recursos" class="tab-content hidden">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold">Recursos Curados para Você</h2>
+                    <p class="text-lg mt-2 max-w-3xl mx-auto">A imersão é a chave. Aqui está uma lista de recursos nativos para mergulhar no idioma. Muitos deles permitem explorar seus interesses em poesia, ficção, política e tecnologia de forma adaptada. Use os filtros para encontrar o que você precisa.</p>
+                </div>
+                <div class="flex justify-center flex-wrap gap-2 mb-8">
+                    <button class="btn filter-btn active py-2 px-4 rounded-full bg-gray-200" data-filter="all">Todos</button>
+                    <button class="btn filter-btn py-2 px-4 rounded-full bg-gray-200" data-filter="leitura">Leitura 📖</button>
+                    <button class="btn filter-btn py-2 px-4 rounded-full bg-gray-200" data-filter="escuta">Escuta 🎧</button>
+                    <button class="btn filter-btn py-2 px-4 rounded-full bg-gray-200" data-filter="video">Vídeo 📺</button>
+                    <button class="btn filter-btn py-2 px-4 rounded-full bg-gray-200" data-filter="portugues">Em Português 🇧🇷</button>
+                </div>
+                <div id="resource-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Resource cards will be injected here by JS -->
+                </div>
+            </section>
+
+            <section id="dicas" class="tab-content hidden">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold">Dicas para Falantes de Português</h2>
+                    <p class="text-lg mt-2 max-w-3xl mx-auto">Aprender mandarim sendo brasileiro tem seus desafios e vantagens. Esta seção foca em pontos cruciais de pronúncia, recursos com suporte em português e como encontrar comunidades para praticar.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="card p-6">
+                        <h3 class="text-2xl font-bold mb-4">📢 Pontos de Atenção</h3>
+                        <p class="mb-2"><strong>Tons:</strong> A maior dificuldade. Exige prática deliberada e constante. A técnica de *shadowing* (imitar nativos) é sua melhor amiga aqui.</p>
+                        <p class="mb-2"><strong>Sons específicos:</strong> Preste atenção em sons como 'ü' (que não temos) e a diferença entre 'j', 'q', 'x' e 'zh', 'ch', 'sh'.</p>
+                        <p><strong>Gramática:</strong> A ausência de conjugação verbal e gênero é um alívio! Foque na ordem das palavras (Sujeito-Verbo-Objeto) e no uso dos classificadores (ex: 一本书 - um 'classificador' livro).</p>
+                    </div>
+                    <div class="card p-6">
+                        <h3 class="text-2xl font-bold mb-4">🤝 Comunidades e Intercâmbio</h3>
+                        <p class="mb-2">A prática com outras pessoas é vital para a motivação e para tornar o aprendizado real.</p>
+                        <ul class="list-disc list-inside space-y-2">
+                            <li><strong>Aplicativos:</strong> HelloTalk e Tandem são excelentes para encontrar parceiros de intercâmbio linguístico.</li>
+                            <li><strong>Tutores:</strong> Plataformas como italki e Preply permitem encontrar professores que falam português.</li>
+                            <li><strong>Grupos:</strong> Procure por grupos de estudo de mandarim no Facebook, Reddit (r/ChineseLanguage) ou Meetup na sua cidade.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    const hskData = {
+        desafio: [
+            { 
+                title: 'Vocabulário Essencial (150 palavras)', 
+                icon: '🗣️',
+                content: `
+                    <p class="mb-4">O HSK1 exige o conhecimento de 150 palavras de alta frequência. Elas cobrem saudações, apresentações, família, números, datas e objetos comuns. Dominar este vocabulário é a base para formar suas primeiras frases.</p>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-gray-100"><tr><th class="p-2">Chinês</th><th class="p-2">Pinyin</th><th class="p-2">Português</th></tr></thead>
+                            <tbody>
+                                <tr class="border-b"><td>我</td><td>wǒ</td><td>eu</td></tr>
+                                <tr class="border-b"><td>你</td><td>nǐ</td><td>você</td></tr>
+                                <tr class="border-b"><td>好</td><td>hǎo</td><td>bom</td></tr>
+                                <tr class="border-b"><td>是</td><td>shì</td><td>ser</td></tr>
+                                <tr class="border-b"><td>不</td><td>bù</td><td>não</td></tr>
+                                <tr class="border-b"><td>老师</td><td>lǎoshī</td><td>professor</td></tr>
+                                <tr class="border-b"><td>电脑</td><td>diànnǎo</td><td>computador</td></tr>
+                                <tr class="border-b"><td>书</td><td>shū</td><td>livro</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `
+            },
+            { 
+                title: 'Gramática Fundamental', 
+                icon: '📜',
+                content: `
+                    <p class="mb-4">A gramática do HSK1 é direta. A estrutura principal é Sujeito-Verbo-Objeto (SVO), como em português. Um grande alívio é a ausência de conjugações verbais e gênero. O foco é em partículas de pergunta, negações e o uso de classificadores.</p>
+                    <div class="overflow-x-auto">
+                         <table class="w-full text-left text-sm">
+                            <thead class="bg-gray-100"><tr><th class="p-2">Ponto Gramatical</th><th class="p-2">Exemplo (Pinyin)</th><th class="p-2">Tradução</th></tr></thead>
+                            <tbody>
+                                <tr class="border-b"><td>Estrutura S-V-O</td><td>Wǒ ài nǐ.</td><td>Eu amo você.</td></tr>
+                                <tr class="border-b"><td>Pergunta com 吗 (ma)</td><td>Nǐ hǎo ma?</td><td>Você está bem?</td></tr>
+                                <tr class="border-b"><td>Negação com 不 (bù)</td><td>Wǒ bù máng.</td><td>Eu não estou ocupado.</td></tr>
+                                <tr class="border-b"><td>Classificador 个 (gè)</td><td>yī gè rén</td><td>uma pessoa</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `
+            },
+            { 
+                title: 'Reconhecimento de Caracteres (150)', 
+                icon: '✍️',
+                content: `
+                    <p class="mb-4">Você precisará reconhecer 150 caracteres. No teste computadorizado, você digita em Pinyin e seleciona o caractere, mas o reconhecimento visual é crucial para a leitura. Aprender os radicais (blocos de construção) e usar mnemônicos ajuda muito. Por exemplo, o caractere para "bom" (好) é a junção de "mulher" (女) e "filho" (子).</p>
+                    <p>Começar a reconhecê-los desde o início é um investimento que acelera seu progresso para os níveis mais altos.</p>
+                `
+            }
+        ],
+        plano: {
+            '1': {
+                title: 'Fase 1 (Dias 1-30): Fundamentos Sólidos',
+                description: 'O foco principal desta fase é dominar o Pinyin e os 4 tons do Mandarim. Esta é a base para evitar mal-entendidos e construir uma pronúncia correta desde o início.',
+                activities: [
+                    'Estudo intensivo do Pinyin e dos tons.',
+                    'Prática de pares de tons (tone pairs).',
+                    'Uso da técnica de *shadowing* para imitar nativos.',
+                    'Aprendizado dos primeiros 50 caracteres HSK1.',
+                    'Introdução a frases básicas de saudação.'
+                ],
+                routine: {
+                    labels: ['Pinyin/Tons', 'Caracteres/Vocabulário', 'Gramática', 'Leitura', 'Escuta'],
+                    data: [30, 30, 15, 15, 30],
+                    total: '2 horas'
+                }
+            },
+            '2': {
+                title: 'Fase 2 (Dias 31-60): Construindo o Vocabulário e a Gramática',
+                description: 'O foco aqui é expandir seu vocabulário para as 150 palavras do HSK1 e consolidar os pontos gramaticais essenciais, usando leitores graduados e podcasts para iniciantes.',
+                activities: [
+                    'Aprender os 100 caracteres/palavras restantes com SRS (Anki).',
+                    'Estudar os pontos gramaticais do HSK1 com exemplos.',
+                    'Iniciar a leitura de textos HSK1 com Pinyin de apoio.',
+                    'Ouvir podcasts para iniciantes com transcrições.',
+                    'Gravar sua própria pronúncia para auto-correção.'
+                ],
+                routine: {
+                    labels: ['Pinyin/Tons', 'Caracteres/Vocabulário', 'Gramática', 'Leitura', 'Escuta', 'Produção'],
+                    data: [15, 45, 30, 30, 30, 15],
+                    total: '2h 45min'
+                }
+            },
+            '3': {
+                title: 'Fase 3 (Dias 61-90): Consolidação e Aplicação',
+                description: 'Nesta fase final, o objetivo é reforçar todo o conhecimento, praticar a aplicação em contextos reais e preparar-se para o exame simulado.',
+                activities: [
+                    'Revisão intensiva de todo o vocabulário e gramática.',
+                    'Aumentar a exposição a leitores e podcasts, reduzindo a dependência de Pinyin.',
+                    'Explorar conteúdos de interesse em formatos simplificados.',
+                    'Praticar a fala e escrita com um tutor ou parceiro.',
+                    'Realizar simulados do exame HSK1.'
+                ],
+                routine: {
+                    labels: ['Pinyin/Tons', 'Caracteres/Vocabulário', 'Gramática', 'Leitura', 'Escuta', 'Produção'],
+                    data: [10, 30, 20, 30, 30, 30],
+                    total: '2h 50min'
+                }
+            }
+        },
+        recursos: [
+            { name: "The Chairman's Bao", type: 'leitura', interest: 'política, tecnologia', desc: 'Notícias graduadas por nível HSK. Excelente para temas atuais.' },
+            { name: "DuChinese", type: 'leitura', interest: 'ficção', desc: 'Contos e notícias com áudio e tradução. Ótimo para ficção.' },
+            { name: "HSKReading", type: 'leitura', interest: 'ficção', desc: 'Histórias gratuitas focadas no vocabulário de cada nível HSK.' },
+            { name: "ChinesePod", type: 'escuta', interest: 'geral', desc: 'Milhares de lições de áudio e vídeo para todos os níveis.' },
+            { name: "Slow Chinese", type: 'escuta', interest: 'cultura', desc: 'Conteúdo falado lentamente para facilitar a compreensão.' },
+            { name: "Learning Chinese Through Stories", type: 'escuta', interest: 'ficção', desc: 'Usa narrativas para ensinar o idioma de forma contextual.' },
+            { name: "Yoyo Chinese", type: 'video', interest: 'geral', desc: 'Vídeos curtos e didáticos sobre Pinyin, tons e conversação.' },
+            { name: "Pula Muralha (Clube de Chinês)", type: 'video', interest: 'cultura', desc: 'Canal brasileiro dedicado ao ensino de Mandarim para brasileiros.', category: 'portugues' },
+            { name: "Mandarin Corner", type: 'video', interest: 'geral', desc: 'Vídeos com conversas autênticas e legendas para melhorar a escuta.' },
+            { name: "italki", type: 'portugues', interest: 'geral', desc: 'Plataforma para encontrar tutores nativos, muitos com experiência com brasileiros.' },
+        ]
+    };
+
+    const navLinks = document.querySelectorAll('.nav-link');
+    const tabContents = document.querySelectorAll('.tab-content');
+    const phaseButtons = document.querySelectorAll('.btn-phase');
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const resourceGrid = document.getElementById('resource-grid');
+    const accordionContainer = document.getElementById('accordion-container');
+
+    let dailyRoutineChart;
+
+    function init() {
+        setupTabs();
+        setupPlan();
+        setupResources();
+        setupAccordion();
+    }
+
+    function setupTabs() {
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const tab = link.dataset.tab;
+
+                navLinks.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+
+                tabContents.forEach(content => {
+                    content.classList.add('hidden');
+                    if (content.id === tab) {
+                        content.classList.remove('hidden');
+                    }
+                });
+            });
+        });
+    }
+
+    function setupAccordion() {
+        let accordionHTML = '';
+        hskData.desafio.forEach((item, index) => {
+            accordionHTML += `
+                <div class="card">
+                    <button class="accordion-toggle w-full flex justify-between items-center text-left p-4 font-semibold text-xl" data-index="${index}">
+                        <span>${item.icon} ${item.title}</span>
+                        <span class="transform transition-transform duration-300">▼</span>
+                    </button>
+                    <div class="accordion-content px-4">
+                        <div class="py-4 border-t border-gray-200">
+                            ${item.content}
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        accordionContainer.innerHTML = accordionHTML;
+
+        const toggles = document.querySelectorAll('.accordion-toggle');
+        toggles.forEach(toggle => {
+            toggle.addEventListener('click', () => {
+                const content = toggle.nextElementSibling;
+                const arrow = toggle.querySelector('span:last-child');
+
+                if (content.style.maxHeight) {
+                    content.style.maxHeight = null;
+                    arrow.style.transform = 'rotate(0deg)';
+                } else {
+                    document.querySelectorAll('.accordion-content').forEach(c => c.style.maxHeight = null);
+                    document.querySelectorAll('.accordion-toggle span:last-child').forEach(a => a.style.transform = 'rotate(0deg)');
+                    content.style.maxHeight = content.scrollHeight + "px";
+                    arrow.style.transform = 'rotate(180deg)';
+                }
+            });
+        });
+    }
+
+    function setupPlan() {
+        const ctx = document.getElementById('dailyRoutineChart').getContext('2d');
+        dailyRoutineChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: [],
+                datasets: [{
+                    data: [],
+                    backgroundColor: ['#FFCDD2', '#C8E6C9', '#BBDEFB', '#FFF9C4', '#D1C4E9', '#FFCCBC'],
+                    borderColor: '#FFFFFF',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed !== null) {
+                                    label += context.parsed + ' min';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        phaseButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const phase = button.dataset.phase;
+                phaseButtons.forEach(b => b.classList.remove('active'));
+                button.classList.add('active');
+                updatePlanView(phase);
+            });
+        });
+
+        updatePlanView('1');
+    }
+
+    function updatePlanView(phase) {
+        const data = hskData.plano[phase];
+        document.getElementById('phase-title').textContent = data.title;
+        document.getElementById('phase-description').textContent = data.description;
+        document.getElementById('total-time').textContent = `Total Diário: ${data.total}`;
+        
+        const activitiesList = document.getElementById('phase-activities');
+        activitiesList.innerHTML = '';
+        data.activities.forEach(activity => {
+            const li = document.createElement('li');
+            li.textContent = activity;
+            activitiesList.appendChild(li);
+        });
+
+        dailyRoutineChart.data.labels = data.routine.labels;
+        dailyRoutineChart.data.datasets[0].data = data.routine.data;
+        dailyRoutineChart.update();
+    }
+
+    function setupResources() {
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const filter = button.dataset.filter;
+                filterButtons.forEach(b => b.classList.remove('active'));
+                button.classList.add('active');
+                renderResources(filter);
+            });
+        });
+        renderResources('all');
+    }
+
+    function renderResources(filter) {
+        resourceGrid.innerHTML = '';
+        const filteredResources = hskData.recursos.filter(resource => {
+            if (filter === 'all') return true;
+            if (filter === 'portugues') return resource.category === 'portugues';
+            return resource.type === filter;
+        });
+
+        filteredResources.forEach(resource => {
+            const card = document.createElement('div');
+            card.className = 'card p-6 flex flex-col';
+            card.innerHTML = `
+                <h3 class="text-xl font-bold mb-2">${resource.name}</h3>
+                <p class="text-gray-600 mb-4 flex-grow">${resource.desc}</p>
+                <div class="flex flex-wrap gap-2 text-xs">
+                    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full">${resource.type}</span>
+                    <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded-full">${resource.interest}</span>
+                    ${resource.category === 'portugues' ? '<span class="bg-green-100 text-green-800 px-2 py-1 rounded-full">🇧🇷</span>' : ''}
+                </div>
+            `;
+            resourceGrid.appendChild(card);
+        });
+    }
+
+    init();
+});
+</script>
+
+</body>
+</html>
